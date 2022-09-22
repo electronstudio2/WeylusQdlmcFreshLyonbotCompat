@@ -1,4 +1,4 @@
-use crate::capturable::{Capturable, Geometry, Recorder};
+use crate::capturable::{Capturable, Recorder};
 use crate::cerror::CError;
 use crate::video::PixelProvider;
 use std::ffi::{CStr, CString};
@@ -95,7 +95,7 @@ impl Capturable for X11Capturable {
         }
     }
 
-    fn geometry(&self) -> Result<Geometry, Box<dyn Error>> {
+    fn geometry_relative(&self) -> Result<(f64, f64, f64, f64), Box<dyn Error>> {
         let mut x: c_float = 0.0;
         let mut y: c_float = 0.0;
         let mut width: c_float = 0.0;
@@ -116,12 +116,7 @@ impl Capturable for X11Capturable {
         if err.is_err() {
             return Err(Box::new(err));
         }
-        Ok(Geometry::Relative(
-            x.into(),
-            y.into(),
-            width.into(),
-            height.into(),
-        ))
+        Ok((x.into(), y.into(), width.into(), height.into()))
     }
 
     fn before_input(&mut self) -> Result<(), Box<dyn Error>> {
