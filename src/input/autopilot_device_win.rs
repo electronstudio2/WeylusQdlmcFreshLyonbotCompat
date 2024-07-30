@@ -65,6 +65,7 @@ impl InputDevice for WindowsInput {
             PointerEventType::CANCEL => {
                 POINTER_FLAG_INRANGE | POINTER_FLAG_UPDATE | POINTER_FLAG_CANCELED
             }
+            PointerEventType::ENTER | PointerEventType::LEAVE => 0
         };
         let button_change_type = match event.buttons {
             Button::PRIMARY => {
@@ -152,7 +153,7 @@ impl InputDevice for WindowsInput {
                     InjectSyntheticPointerInput(self.touch_device_handle, m, len as u32);
 
                     match event.event_type {
-                        PointerEventType::DOWN | PointerEventType::MOVE => {}
+                        PointerEventType::DOWN | PointerEventType::MOVE | PointerEventType::ENTER | PointerEventType::LEAVE=> {}
 
                         PointerEventType::UP | PointerEventType::CANCEL => {
                             self.multitouch_map.remove(&event.pointer_id);
@@ -198,7 +199,8 @@ impl InputDevice for WindowsInput {
                     },
                     PointerEventType::CANCEL => {
                         dw_flags |= MOUSEEVENTF_LEFTUP;
-                    }
+                    },
+                    PointerEventType::ENTER | PointerEventType::LEAVE => {}
                 }
                 unsafe { mouse_event(dw_flags, 0 as u32, 0 as u32, 0, 0) };
             }
